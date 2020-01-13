@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+
+  web:
+    image: "local-django-web-service"
+    build:
+      context: ../../src
+      dockerfile: ../docker/development/web/Dockerfile
+    volumes:
+      - ../../src:/code
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+    command: python manage.py runserver 0.0.0.0:8000 --settings=config.settings.development
+
+  db:
+    image: "local-psql-db-service"
+    build:
+      context: ../../src
+      dockerfile: ../docker/development/db/Dockerfile
+    volumes:
+      - local-psql-db-service-data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    env_file: ../../src/env/.postgres
+
+volumes:
+  local-psql-db-service-data:

@@ -1,0 +1,33 @@
+version: 2
+
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.8.1
+      - image: circleci/postgres:12.1
+        environment:
+          POSTGRES_DB: $POSTGRES_DB
+          POSTGRES_USER: $POSTGRES_USER
+          POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      - run:
+          name: Install dependencies
+          working_directory: ~/repo/src
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install -r requirements.txt
+
+      - run:
+          name: Run tests
+          working_directory: ~/repo/src
+          environment:
+            SECRET_KEY: $SECRET_KEY
+          command: |
+            . venv/bin/activate
+            python manage.py test --settings=config.settings.test
